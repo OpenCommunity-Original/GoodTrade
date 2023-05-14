@@ -1,7 +1,8 @@
-package com.minedhype.ishop.inventories;
+package com.opencommunity.goodtrade.inventories;
 
-import com.minedhype.ishop.Shop;
-import com.minedhype.ishop.iShop;
+import com.opencommunity.goodtrade.Shop;
+import com.opencommunity.goodtrade.GoodTrade;
+import com.opencommunity.goodtrade.utils.LocaleAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -11,8 +12,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import com.minedhype.ishop.Messages;
-import com.minedhype.ishop.gui.GUI;
+import com.opencommunity.goodtrade.gui.GUI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +48,7 @@ public class InvShopList extends GUI {
 		}
 	}
 
-	private void PlayerShopList() {
+	private void PlayerShopList(Player player) {
 		int index = pag * 45;
 		for(int i = 0; i < 45; i++) {
 			if(index <= shopslist.size()-1) {
@@ -60,15 +60,15 @@ public class InvShopList extends GUI {
 		int shopListPages = (int)Math.ceil(shopslist.size()-1)/44;
 		for(int i=45; i<54; i++) {
 			if(i == 47 && pag > 0)
-				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag)), p -> openPage(p, pag-1));
+				placeItem(i, GUI.createItem(Material.ARROW, LocaleAPI.getMessage(player, "page") + " " + (pag)), p -> openPage(p, pag-1));
 			else if(i == 51 && pag < shopListPages)
-				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag+2)), p -> openPage(p, pag+1));
+				placeItem(i, GUI.createItem(Material.ARROW, LocaleAPI.getMessage(player, "page") + " " + (pag+2)), p -> openPage(p, pag+1));
 			else
 				placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 		}
 	}
 
-	private static void getShopList(UUID uuid) {
+	private static void getShopList(UUID uuid, Player player) {
 		for(Integer id : Shop.shopList.keySet()) {
 			if(Shop.shopList.get(id) != null) {
 				if(Shop.shopList.get(id).equals(uuid) && !Shop.showOwnedShops)
@@ -79,9 +79,9 @@ public class InvShopList extends GUI {
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(Shop.shopList.get(id));
 					skullMeta.setOwningPlayer(offlinePlayer);
 					if(Shop.getShopById(id).get().isAdmin())
-						skullMeta.setDisplayName(Messages.ADMIN_SHOP_NUMBER.toString().replaceAll("%id", id.toString()));
+						skullMeta.setDisplayName(LocaleAPI.getMessage(player, "admin_shop_number").replaceAll("%id", id.toString()));
 					else
-						skullMeta.setDisplayName(Messages.SHOP_NUMBER.toString().replaceAll("%player", offlinePlayer.getName()).replaceAll("%id", id.toString()));
+						skullMeta.setDisplayName(LocaleAPI.getMessage(player, "shop_number").replaceAll("%player", offlinePlayer.getName()).replaceAll("%id", id.toString()));
 					List<String> skullLore = new ArrayList<>();
 					skullLore.add(id.toString());
 					skullMeta.setLore(skullLore);
@@ -105,10 +105,10 @@ public class InvShopList extends GUI {
 		shopslist.clear();
 		final UUID playerUUID = player.getUniqueId();
 		final Player openPlayer = player;
-		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () ->  {
-			getShopList(playerUUID);
-			Bukkit.getScheduler().runTask(iShop.getPlugin(), () -> {
-				PlayerShopList();
+		Bukkit.getScheduler().runTaskAsynchronously(GoodTrade.getPlugin(), () -> {
+			getShopList(playerUUID, player);
+			Bukkit.getScheduler().runTask(GoodTrade.getPlugin(), () -> {
+				PlayerShopList(player);
 				super.open(openPlayer);
 			});
 		});

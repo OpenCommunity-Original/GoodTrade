@@ -1,4 +1,4 @@
-package com.minedhype.ishop;
+package com.opencommunity.goodtrade;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,8 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import com.minedhype.ishop.inventories.InvAdminShop;
+import com.opencommunity.goodtrade.inventories.InvAdminShop;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -29,22 +30,24 @@ import org.bukkit.plugin.Plugin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.minedhype.ishop.inventories.InvStock;
+import com.opencommunity.goodtrade.inventories.InvStock;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.milkbowl.vault.economy.Economy;
 
 public class Shop {
-	public static boolean deletePlayerShop = iShop.config.getBoolean("deleteBlock");
-	public static boolean particleEffects = iShop.config.getBoolean("showParticles");
-	public static boolean shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
-	public static boolean shopEnabled = iShop.config.getBoolean("enableShopBlock");
-	public static boolean showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
-	public static boolean shopNotifications = iShop.config.getBoolean("enableShopNotifications");
-	public static boolean stockMessages = iShop.config.getBoolean("enableShopSoldMessage");
-	public static boolean stockMessagesSaveAll = iShop.config.getBoolean("enableSavingAllShopSoldMessages");
-	public static List<String> exemptExpiringList = iShop.config.getStringList("exemptExpiringShops");
-	public static int maxDays = iShop.config.getInt("maxInactiveDays");
+	public static boolean deletePlayerShop = GoodTrade.config.getBoolean("deleteBlock");
+	public static boolean particleEffects = GoodTrade.config.getBoolean("showParticles");
+	public static boolean saveEmptyShops = GoodTrade.config.getBoolean("saveEmptyShops");
+	public static boolean shopOutStock = GoodTrade.config.getBoolean("enableOutOfStockMessages");
+	public static boolean shopEnabled = GoodTrade.config.getBoolean("enableShopBlock");
+	public static boolean showOwnedShops = GoodTrade.config.getBoolean("publicShopListShowsOwned");
+	public static boolean shopNotifications = GoodTrade.config.getBoolean("enableShopNotifications");
+	public static boolean stockMessages = GoodTrade.config.getBoolean("enableShopSoldMessage");
+	public static boolean stockMessagesSaveAll = GoodTrade.config.getBoolean("enableSavingAllShopSoldMessages");
+	public static List<String> exemptExpiringList = GoodTrade.config.getStringList("exemptExpiringShops");
+	public static int maxDays = GoodTrade.config.getInt("maxInactiveDays");
 	public static final ConcurrentHashMap<Integer, UUID> shopList = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<UUID, ArrayList<String>> shopMessages = new ConcurrentHashMap<>();
 	private static boolean exemptListInactive;
@@ -71,8 +74,7 @@ public class Shop {
 			Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 				PreparedStatement stmt = null;
 				try {
-					Class.forName("org.sqlite.JDBC");
-					stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaTiendas (location, owner, admin) VALUES (?,?,?);", Statement.RETURN_GENERATED_KEYS);
+					stmt = GoodTrade.getConnection().prepareStatement("INSERT INTO zooMercaTiendas (location, owner, admin) VALUES (?,?,?);", Statement.RETURN_GENERATED_KEYS);
 					String locationRaw = loc.getBlockX()+";"+loc.getBlockY()+";"+loc.getBlockZ()+";"+ loc.getWorld().getName();
 					stmt.setString(1, locationRaw);
 					stmt.setString(2, owner.toString());
@@ -97,11 +99,55 @@ public class Shop {
 	public static boolean checkShopDistanceFromStockBlock(Location stockLocation, UUID shopOwner) { return shops.parallelStream().filter(s -> !s.admin && s.isOwner(shopOwner)).anyMatch(s -> s.getLocation().getWorld().equals(stockLocation.getWorld()) && s.location.distanceSquared(stockLocation) <= EventShop.stockRangeLimit*EventShop.stockRangeLimit); }
 	public static int getNumShops(UUID owner) { return (int) shops.parallelStream().filter(t -> !t.admin && t.owner.equals(owner)).count(); }
 
+	public static boolean strictStockShopCheck(ItemStack item, UUID uuid) {
+		AtomicBoolean restricted = new AtomicBoolean(true);
+		shops.parallelStream().filter(s -> !s.admin && s.isOwner(uuid)).forEach(s -> {
+			if(restricted.get()) {
+				for(int i=0; i<5; i++) {
+					if(restricted.get()) {
+						Optional<RowStore> row = s.getRow(i);
+						if(row.isPresent())
+							if(row.get().getItemOut().isSimilar(item) || row.get().getItemOut2().isSimilar(item))
+								restricted.set(false);
+					}
+				}
+			}
+		});
+		return restricted.get();
+	}
+
 	public static void getPlayersShopList() {
-		if(iShop.config.getBoolean("adminShopPublic"))
+		if(GoodTrade.config.getBoolean("adminShopPublic"))
 			shops.parallelStream().forEach(s -> shopList.putIfAbsent(s.idTienda, s.owner));
 		else
 			shops.parallelStream().filter(s -> !s.admin).forEach(s -> shopList.putIfAbsent(s.idTienda, s.owner));
+	}
+
+	public static void removeAllPlayersShops(Player player, UUID sOwner, String pOwner) {
+		int deletedCount = 0;
+		List<Shop> deleteShops = new ArrayList<>();
+		for(Shop shop:shops)
+			if(!shop.admin && shop.isOwner(sOwner)) {
+				deleteShops.add(shop);
+				deletedCount++;
+			}
+		for(Shop shop:deleteShops) {
+			shopList.remove(shop.shopId());
+			shop.deleteShop();
+		}
+		Optional<Economy> economy = GoodTrade.getEconomy();
+		if(economy.isPresent()) {
+			double cost = GoodTrade.config.getDouble("returnAmount");
+			if(deletedCount > 0 && cost > 0) {
+				OfflinePlayer offPlayer = Bukkit.getOfflinePlayer(sOwner);
+				double totalCost = cost * deletedCount;
+				economy.get().depositPlayer(offPlayer, totalCost);
+			}
+		}
+		if(deletedCount > 0)
+			player.sendMessage(Messages.SHOP_REMOVED_ALL_PLAYER.toString().replaceAll("%p", pOwner).replaceAll("%shops", String.valueOf(deletedCount)));
+		else
+			player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
 	}
 
 	public static void getShopList(Player player, UUID sOwner, String pOwner) {
@@ -129,7 +175,7 @@ public class Shop {
 					player.spigot().sendMessage(manageMsg, shopMsg);
 				} else
 					player.spigot().sendMessage(manageMsg);
-			} else if(iShop.config.getBoolean("remoteShopping") && !s.isOwner(player.getUniqueId())) {
+			} else if(GoodTrade.config.getBoolean("remoteShopping") && !s.isOwner(player.getUniqueId())) {
 				String shopMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
 				TextComponent shopMsg = new TextComponent(shopMessage);
 				TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_SHOP + ChatColor.DARK_GRAY + "]");
@@ -425,7 +471,7 @@ public class Shop {
 		PreparedStatement loadShops = null;
 
 		try {
-			loadStocks = iShop.getConnection().prepareStatement("SELECT owner, items, pag FROM zooMercaStocks;");
+			loadStocks = GoodTrade.getConnection().prepareStatement("SELECT owner, items, pag FROM zooMercaStocks;");
 			ResultSet dataStocks = loadStocks.executeQuery();
 			while(dataStocks.next()) {
 				String ownerRaw = dataStocks.getString(1);
@@ -446,16 +492,22 @@ public class Shop {
 				StockShop stock = new StockShop(owner, pag);
 				stock.getInventory().setContents(itemsList.toArray(new ItemStack[0]));
 			}
-			loadShops = iShop.getConnection().prepareStatement("SELECT location, owner, itemIn, itemIn2, itemOut, itemOut2, idTienda, admin, broadcast FROM zooMercaTiendasFilas LEFT JOIN zooMercaTiendas ON id = idTienda ORDER BY idTienda;");
+			loadShops = GoodTrade.getConnection().prepareStatement("SELECT location, owner, itemIn, itemIn2, itemOut, itemOut2, idTienda, admin, broadcast FROM zooMercaTiendasFilas LEFT JOIN zooMercaTiendas ON id = idTienda ORDER BY idTienda;");
 			ResultSet dataStore = loadShops.executeQuery();
 			while(dataStore.next()) {
+				if(dataStore.getString(1) == null) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null location found in database! Make backups!");
+					continue;
+				}
 				String[] locationRaw = dataStore.getString(1).split(";");
 				int x = Integer.parseInt(locationRaw[0]);
 				int y = Integer.parseInt(locationRaw[1]);
 				int z = Integer.parseInt(locationRaw[2]);
 				World world = Bukkit.getWorld(locationRaw[3]);
-				if(world == null)
+				if(world == null) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null world found in database! Make backups!");
 					continue;
+				}
 				Location location = new Location(world, x, y, z);
 				Optional<Shop> shop = Shop.getShopByLocation(location);
 				if(!shop.isPresent()) {
@@ -503,7 +555,7 @@ public class Shop {
 
 		} catch(Exception e) {
 			e.printStackTrace();
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[GoodTrade] Failed to load database properly! Shutting down to prevent data corruption.");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Failed to load database properly! Shutting down to prevent data corruption.");
 			Bukkit.shutdown();
 		} finally {
 			try {
@@ -517,11 +569,11 @@ public class Shop {
 		}
 	}
 
-	public static void saveData() {
+	public static void saveData(boolean shutDown) {
 		StockShop.saveData();
 		PreparedStatement stmt = null;
 		try {
-			stmt = iShop.getConnection().prepareStatement("DELETE FROM zooMercaTiendasFilas;");
+			stmt = GoodTrade.getConnection().prepareStatement("DELETE FROM zooMercaTiendasFilas;");
 			stmt.execute();
 		} catch (Exception e) { e.printStackTrace(); }
 		finally {
@@ -530,8 +582,18 @@ public class Shop {
 					stmt.close();
 			} catch (Exception e) { e.printStackTrace(); }
 		}
-		for(Shop shop : shops)
-			shop.saveDataShop();
+		if(shutDown && saveEmptyShops) {
+			for(Shop shop : shops)
+				if(shop.saveDataShopEmpty()) {
+					ItemStack air = new ItemStack(Material.AIR, 0);
+					shop.getRows()[0] = new RowStore(air, air, air, air, false);
+					shop.saveEmptyShops();
+				}
+		}
+		else {
+			for(Shop shop : shops)
+				shop.saveDataShop();
+		}
 	}
 
 	public boolean hasItems() {
@@ -545,6 +607,30 @@ public class Shop {
 		for(RowStore row : rows)
 			if(row != null)
 				row.saveData(idTienda);
+	}
+
+	private boolean saveDataShopEmpty() {
+		boolean isEmpty = true;
+		for(RowStore row : rows)
+			if(row != null) {
+				row.saveData(idTienda);
+				if(isEmpty)
+					isEmpty = false;
+			}
+		return isEmpty;
+	}
+
+	private void saveEmptyShops() {
+		RowStore row = rows[0];
+		row.saveData(idTienda);
+	}
+
+	public static void removeEmptyShopTrade() {
+		for(Shop shop : shops) {
+			Optional<RowStore> row = shop.getRow(0);
+			if(row.get().getItemIn().getType().isAir() &&  row.get().getItemIn2().getType().isAir() && row.get().getItemOut().getType().isAir() && row.get().getItemOut2().getType().isAir())
+				shop.delete(0);
+		}
 	}
 
 	public void buy(Player player, int index) {
@@ -563,7 +649,7 @@ public class Shop {
 				if(shopOutStock) {
 					final Player ownerPlayer = Bukkit.getPlayer(owner);
 					final String itemString = row.get().getItemOut().getType().toString();
-					Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
+					Bukkit.getScheduler().runTaskAsynchronously(GoodTrade.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
 				}
 				return;
 		} else {
@@ -572,7 +658,7 @@ public class Shop {
 				if(shopOutStock) {
 					final Player ownerPlayer = Bukkit.getPlayer(owner);
 					final String itemString = row.get().getItemOut().getType().toString();
-					Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
+					Bukkit.getScheduler().runTaskAsynchronously(GoodTrade.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
 				}
 				return;
 			}
@@ -581,7 +667,7 @@ public class Shop {
 				if(shopOutStock) {
 					final Player ownerPlayer = Bukkit.getPlayer(owner);
 					final String itemString = row.get().getItemOut2().getType().toString();
-					Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
+					Bukkit.getScheduler().runTaskAsynchronously(GoodTrade.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
 				}
 				return;
 			}
@@ -706,7 +792,7 @@ public class Shop {
 		final int iA2 = inA2;
 		final int oA1 = outA1;
 		final int oA2 = outA2;
-		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> sendShopMessages(i1, i2, o1, o2, iA1, iA2, oA1, oA2, this.owner, shoppingPlayer, this.admin, rowBroadcast));
+		Bukkit.getScheduler().runTaskAsynchronously(GoodTrade.getPlugin(), () -> sendShopMessages(i1, i2, o1, o2, iA1, iA2, oA1, oA2, this.owner, shoppingPlayer, this.admin, rowBroadcast));
 	}
 
 	public boolean hasExpired() {
@@ -725,7 +811,11 @@ public class Shop {
 
 	public void giveItem(ItemStack item) {
 		ItemStack copy = item.clone();
-		int max = iShop.config.getInt("stockPages");
+		int max;
+		if(InvAdminShop.usePerms)
+			max = InvAdminShop.permissionMax;
+		else
+			max = InvAdminShop.maxPages;
 		for(int i=0; i<max; i++) {
 			Optional<StockShop> stock = StockShop.getStockShopByOwner(this.owner, i);
 			if(!stock.isPresent())
@@ -741,7 +831,11 @@ public class Shop {
 
 	public void takeItem(ItemStack item) {
 		ItemStack copy = item.clone();
-		int max = iShop.config.getInt("stockPages");
+		int max;
+		if(InvAdminShop.usePerms)
+			max = InvAdminShop.permissionMax;
+		else
+			max = InvAdminShop.maxPages;
 		for(int i=0; i<max; i++) {
 			Optional<StockShop> stock = StockShop.getStockShopByOwner(this.owner, i);
 			if(!stock.isPresent())
@@ -755,7 +849,7 @@ public class Shop {
 		InvStock.getInvStock(this.owner).refreshItems();
 	}
 
-	public void delete(Player player, int index) {
+	public void delete(int index) {
 		rows[index] = null;
 	}
 	public void deleteShop() {
@@ -765,16 +859,16 @@ public class Shop {
 		if(removalOfArray) {
 			shops.remove(this);
 			if(deletePlayerShop)
-				Bukkit.getScheduler().runTask(iShop.getPlugin(), () -> this.location.getBlock().setType(Material.AIR));
+				Bukkit.getScheduler().runTask(GoodTrade.getPlugin(), () -> this.location.getBlock().setType(Material.AIR));
 		}
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			PreparedStatement stmt1 = null;
 			PreparedStatement stmt2 = null;
 			try {
-				stmt1 = iShop.getConnection().prepareStatement("DELETE FROM zooMercaTiendasFilas WHERE idTienda = ?;");
+				stmt1 = GoodTrade.getConnection().prepareStatement("DELETE FROM zooMercaTiendasFilas WHERE idTienda = ?;");
 				stmt1.setInt(1, idTienda);
 				stmt1.execute();
-				stmt2 = iShop.getConnection().prepareStatement("DELETE FROM zooMercaTiendas WHERE id = ?;");
+				stmt2 = GoodTrade.getConnection().prepareStatement("DELETE FROM zooMercaTiendas WHERE id = ?;");
 				stmt2.setInt(1, idTienda);
 				stmt2.execute();
 			} catch (Exception e) { e.printStackTrace(); }
@@ -1054,7 +1148,7 @@ public class Shop {
 
 	public void outOfStockItem(Player ownerPlayer, String itemString) {
 		if(cdTime.containsKey(ownerPlayer)) {
-			int cdTimeInSec = iShop.config.getInt("noStockCooldown");
+			int cdTimeInSec = GoodTrade.config.getInt("noStockCooldown");
 			long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
 			if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
 				if(!itemString.equals("AIR")) {
@@ -1068,6 +1162,57 @@ public class Shop {
 					cdTime.put(ownerPlayer, System.currentTimeMillis());
 				}
 		}
+	}
+
+	public static boolean hasDuplicateTrades(ItemStack out1, ItemStack out2, ItemStack in1, ItemStack in2, int shopId) {
+		Optional <Shop> shop = getShopById(shopId);
+		for(RowStore row:shop.get().getRows()) {
+			if(row != null) {
+				boolean row1, row2, row3, row4;
+				if(row.getItemIn().equals(in1) || (row.getItemIn().getType().isAir() && in1.getType().isAir()))
+					row1 = true;
+				else continue;
+				if(row.getItemIn2().equals(in2) || (row.getItemIn2().getType().isAir() && in2.getType().isAir()))
+					row2 = true;
+				else continue;
+				if(row.getItemOut().equals(out1) || (row.getItemOut().getType().isAir() && out1.getType().isAir()))
+					row3 = true;
+				else continue;
+				if(row.getItemOut2().equals(out2) || (row.getItemOut2().getType().isAir() && out2.getType().isAir()))
+					row4 = true;
+				else continue;
+				if(row1 && row2 && row3 && row4)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean hasAnyDuplicateTrades(ItemStack out1, ItemStack out2, ItemStack in1, ItemStack in2, UUID shopOwner) {
+		for(Shop shop:shops) {
+			if(shop.isOwner(shopOwner) && !shop.isAdmin()) {
+				for(RowStore row:shop.getRows()) {
+					if(row != null) {
+						boolean row1, row2, row3, row4;
+						if(row.getItemIn().equals(in1) || (row.getItemIn().getType().isAir() && in1.getType().isAir()))
+							row1 = true;
+						else continue;
+						if(row.getItemIn2().equals(in2) || (row.getItemIn2().getType().isAir() && in2.getType().isAir()))
+							row2 = true;
+						else continue;
+						if(row.getItemOut().equals(out1) || (row.getItemOut().getType().isAir() && out1.getType().isAir()))
+							row3 = true;
+						else continue;
+						if(row.getItemOut2().equals(out2) || (row.getItemOut2().getType().isAir() && out2.getType().isAir()))
+							row4 = true;
+						else continue;
+						if(row1 && row2 && row3 && row4)
+							return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	public Optional<RowStore> getRow(int index) {

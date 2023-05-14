@@ -1,19 +1,21 @@
-package com.minedhype.ishop.inventories;
+package com.opencommunity.goodtrade.inventories;
 
+import com.opencommunity.goodtrade.Permission;
+import com.opencommunity.goodtrade.RowStore;
+import com.opencommunity.goodtrade.Shop;
+import com.opencommunity.goodtrade.utils.LocaleAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import com.minedhype.ishop.RowStore;
-import com.minedhype.ishop.Messages;
-import com.minedhype.ishop.Shop;
-import com.minedhype.ishop.iShop;
-import com.minedhype.ishop.gui.GUI;
+import com.opencommunity.goodtrade.GoodTrade;
+import com.opencommunity.goodtrade.gui.GUI;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BundleMeta;
 import java.util.List;
@@ -24,23 +26,26 @@ public class InvCreateRow extends GUI {
 	private ItemStack itemOut;
 	private ItemStack itemOut2;
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
-	public static Boolean itemsDisabled = iShop.config.getBoolean("disabledItems");
-	public static List<String> disabledItemList = iShop.config.getStringList("disabledItemsList");
+	public static Boolean itemsDisabled = GoodTrade.config.getBoolean("disabledItems");
+	public static Boolean preventDupeTrades = GoodTrade.config.getBoolean("preventDuplicates");
+	public static Boolean preventAllDupeTrades = GoodTrade.config.getBoolean("preventAllDuplicates");
+	public static Boolean strictStock = GoodTrade.config.getBoolean("strictStock");
+	public static List<String> disabledItemList = GoodTrade.config.getStringList("disabledItemsList");
 	
-	public InvCreateRow(Shop shop, int index) {
-		super(9*3, Messages.SHOP_TITLE_CREATESHOP.toString());
+	public InvCreateRow(Shop shop, int index, Player player) {
+		super(27, LocaleAPI.getMessage(player, "create_shop_title"));
 		for(int i=0; i<9*3; i++) {
 			if(i == 1)
-				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + Messages.SHOP_TITLE_SELL.toString()));
+				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + LocaleAPI.getMessage(player, "sell_title")));
 			else if(i == 2)
-				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + Messages.SHOP_TITLE_SELL2.toString()));
+				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + LocaleAPI.getMessage(player, "sell_title_2")));
 			else if(i == 6)
-				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + Messages.SHOP_TITLE_BUY.toString()));
+				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + LocaleAPI.getMessage(player, "buy_title")));
 			else if(i == 7)
-				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + Messages.SHOP_TITLE_BUY2.toString()));
+				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + LocaleAPI.getMessage(player, "buy_title_2")));
 			else if(i == 10 || i == 11) { }
 			else if(i == 13) {
-				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + Messages.SHOP_TITLE_CREATE.toString()), p -> {
+				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + LocaleAPI.getMessage(player, "create_title")), p -> {
 					if(itemIn == null)
 						itemIn = airItem;
 					if(itemIn2 == null)
@@ -53,14 +58,24 @@ public class InvCreateRow extends GUI {
 						return;
 					if((itemOut == airItem && itemOut2 == airItem) || (itemIn == airItem && itemIn2 == airItem))
 						return;
+					ItemStack in1 = itemIn.clone();
+					ItemStack in2 = itemIn2.clone();
+					ItemStack out1 = itemOut.clone();
+					ItemStack out2 = itemOut2.clone();
+					if(!p.hasPermission(Permission.SHOP_ADMIN.toString())) {
+						if(preventAllDupeTrades) {
+							if(Shop.hasAnyDuplicateTrades(out1, out2, in1, in2, p.getUniqueId()))
+								return;
+						}
+						else if(preventDupeTrades) {
+							if(Shop.hasDuplicateTrades(out1, out2, in1, in2, shop.shopId()))
+								return;
+						}
+					}
 					if(itemsDisabled) {
 						for(String itemsList:disabledItemList) {
 							Material disabledItemsList = Material.matchMaterial(itemsList);
 							if(disabledItemsList != null) {
-								ItemStack in1 = itemIn.clone();
-								ItemStack in2 = itemIn2.clone();
-								ItemStack out1 = itemOut.clone();
-								ItemStack out2 = itemOut2.clone();
 								if(in1.getType().equals(disabledItemsList) || in2.getType().equals(disabledItemsList) || out1.getType().equals(disabledItemsList) || out2.getType().equals(disabledItemsList))
 									return;
 								if(in1.getType().toString().contains("SHULKER_BOX") && in1.getItemMeta() instanceof BlockStateMeta) {
@@ -130,7 +145,7 @@ public class InvCreateRow extends GUI {
 							}
 						}
 					}
-					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);
+					shop.getRows()[index] = new RowStore(out1, out2, in1, in2, false);
 					InvAdminShop inv = new InvAdminShop(shop, p.getPlayer());
 					inv.open(p);
 				});
@@ -141,24 +156,26 @@ public class InvCreateRow extends GUI {
 		}
 	}
 	
-	public void onDrag(InventoryDragEvent event) {		
+	public void onDrag(InventoryDragEvent event) {
+		Player player = (Player)event.getWhoClicked();
 		super.onDrag(event);
 		Inventory inv = event.getInventory();
-		if(inv.getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(Messages.SHOP_TITLE_CREATESHOP.toString()))
+		if(inv.getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(LocaleAPI.getMessage(player, "create_shop_title")))
 			event.setCancelled(true);
 	}
 	
 	@Override
 	public void onClick(InventoryClickEvent event) {
+		Player player = (Player)event.getWhoClicked();
 		super.onClick(event);
 		if(!event.getAction().equals(InventoryAction.PLACE_ALL) && !event.getAction().equals(InventoryAction.PICKUP_ALL))
 			return;
 		event.setCancelled(false);
 		Inventory inv = event.getClickedInventory();
-		if(inv.getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(Messages.SHOP_TITLE_CREATESHOP.toString())) {
+		if(inv.getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(LocaleAPI.getMessage(player, "create_shop_title"))) {
 			event.setCancelled(true);
 			if(event.getRawSlot() == 10 || event.getRawSlot() == 11 || event.getRawSlot() == 15 || event.getRawSlot() == 16) {
-				ItemStack item =  event.getCursor().clone();
+				ItemStack item = event.getCursor().clone();
 				if(event.getClick().isRightClick())
 					item.setAmount(1);
 				placeItem(event.getRawSlot(), item);

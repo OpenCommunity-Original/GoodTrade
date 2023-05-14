@@ -1,4 +1,4 @@
-package com.minedhype.ishop;
+package com.opencommunity.goodtrade;
 
 import java.sql.PreparedStatement;
 import org.bukkit.Material;
@@ -24,7 +24,7 @@ public class RowStore {
 	public void saveData(int idTienda) {
 		PreparedStatement stmt = null;
 		try {
-			stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaTiendasFilas (itemIn, itemIn2, itemOut, itemOut2, idTienda, broadcast) VALUES (?,?,?,?,?,?);");
+			stmt = GoodTrade.getConnection().prepareStatement("INSERT INTO zooMercaTiendasFilas (itemIn, itemIn2, itemOut, itemOut2, idTienda, broadcast) VALUES (?,?,?,?,?,?);");
 			YamlConfiguration configIn1 = new YamlConfiguration();
 			if(itemIn != null) {
 				itemIn.serialize().forEach(configIn1::set);

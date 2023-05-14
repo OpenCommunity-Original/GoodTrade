@@ -1,6 +1,7 @@
-package com.minedhype.ishop.gui;
+package com.opencommunity.goodtrade.gui;
 
-import com.minedhype.ishop.iShop;
+import com.opencommunity.goodtrade.GoodTrade;
+import com.opencommunity.goodtrade.inventories.InvStock;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,7 +10,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import com.minedhype.ishop.inventories.InvStock;
 
 public class GUIEvent implements Listener {
 	@EventHandler
@@ -43,7 +43,7 @@ public class GUIEvent implements Listener {
 		GUI gui = GUI.inventoriesOpen.get(player.getName());
 		if(gui != null)
 			gui.onClose(e);
-		Bukkit.getServer().getScheduler().runTaskLater(iShop.getPlugin(), player::updateInventory, 1);
+		Bukkit.getServer().getScheduler().runTaskLater(GoodTrade.getPlugin(), player::updateInventory, 1);
 		GUI.inventoriesOpen.remove(player.getName());
 		InvStock.inShopInv.remove(player);
 	}

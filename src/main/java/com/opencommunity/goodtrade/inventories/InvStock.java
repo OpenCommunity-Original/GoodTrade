@@ -1,16 +1,15 @@
-package com.minedhype.ishop.inventories;
+package com.opencommunity.goodtrade.inventories;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.HashMap;
-import com.minedhype.ishop.Messages;
-import com.minedhype.ishop.Permission;
-import com.minedhype.ishop.Shop;
-import com.minedhype.ishop.StockShop;
-import com.minedhype.ishop.iShop;
-import com.minedhype.ishop.gui.GUI;
+import com.opencommunity.goodtrade.Permission;
+import com.opencommunity.goodtrade.Shop;
+import com.opencommunity.goodtrade.StockShop;
+import com.opencommunity.goodtrade.gui.GUI;
+import com.opencommunity.goodtrade.utils.LocaleAPI;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -28,23 +27,30 @@ public class InvStock extends GUI {
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	private final UUID owner;
 	private int pag;
+	private int stockPages;
 	private Player player;
-
-	private InvStock(UUID owner) {
-		super(54, Messages.SHOP_TITLE_STOCK.toString());
+	
+	private InvStock(UUID owner, Player player) {
+		super(54, LocaleAPI.getMessage(player, "stock_title"));
 		inventories.add(this);
 		this.owner = owner;
 		this.pag = 0;
 	}
-
-	public static InvStock getInvStock(UUID owner) { return inventories.parallelStream().filter(inv -> inv.owner.equals(owner)).findFirst().orElse(new InvStock(owner)); }
-
+	
+	public static InvStock getInvStock(UUID owner, Player player) { return inventories.parallelStream().filter(inv -> inv.owner.equals(owner)).findFirst().orElse(new InvStock(owner, player)); }
+	
 	@Override
 	public void onClick(InventoryClickEvent event) {
 		super.onClick(event);
 		if(event.getRawSlot() >= 45 && event.getRawSlot() < 54)
 			return;
 		if(event.getRawSlot() >= 54 && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			if(InvCreateRow.strictStock) {
+				ItemStack item = event.getCurrentItem();
+				ItemStack item2 = event.getCursor();
+				if(Shop.strictStockShopCheck(item, owner) || Shop.strictStockShopCheck(item2, owner))
+					return;
+			}
 			if(InvCreateRow.itemsDisabled) {
 				ItemStack item = event.getCurrentItem();
 				ItemStack item2 = event.getCursor();
@@ -99,7 +105,7 @@ public class InvStock extends GUI {
 		}
 		event.setCancelled(false);
 	}
-
+	
 	public void refreshItems() {
 		Optional<StockShop> stockOpt = StockShop.getStockShopByOwner(owner, pag);
 		StockShop stock;
@@ -107,17 +113,20 @@ public class InvStock extends GUI {
 		Inventory inv = stock.getInventory();
 		for(int i=0; i<45; i++)
 			placeItem(i, inv.getItem(i));
-
 		for(int i=45; i<54; i++) {
-			if(i == 47 && pag > 0)
-				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag)), p -> openPage(p, pag-1));
-			else if(i == 51 && pag < iShop.config.getInt("stockPages")-1)
-				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag+2)), p -> openPage(p, pag+1));
+			if(i == 46 && pag > 4 && stockPages >= 10)
+				placeItem(i, GUI.createItem(Material.SPECTRAL_ARROW, LocaleAPI.getMessage(player, "page_skip_prev")), p -> openPage(p, pag-5));
+			else if(i == 47 && pag > 0)
+				placeItem(i, GUI.createItem(Material.ARROW, LocaleAPI.getMessage(player, "page") + " " + (pag)), p -> openPage(p, pag-1));
+			else if(i == 51 && pag < stockPages-1)
+				placeItem(i, GUI.createItem(Material.ARROW, LocaleAPI.getMessage(player, "page") + " " + (pag+2)), p -> openPage(p, pag+1));
+			else if(i == 52 && pag < stockPages-5 && stockPages >= 10)
+				placeItem(i, GUI.createItem(Material.SPECTRAL_ARROW, LocaleAPI.getMessage(player, "page_skip_ahead")), p -> openPage(p, pag+5));
 			else
 				placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 		}
 	}
-
+	
 	private void openPage(Player player, int pag) {
 		for(int i=45; i<54; i++)
 			placeItem(i, new ItemStack(Material.AIR));
@@ -125,14 +134,14 @@ public class InvStock extends GUI {
 		this.pag = pag;
 		this.open(player);
 	}
-
+	
 	@Override
 	public void open(Player player) {
 		this.player = player;
 		refreshItems();
 		super.open(player);
 	}
-
+	
 	@Override
 	public void onClose(InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
@@ -141,8 +150,11 @@ public class InvStock extends GUI {
 			return;
 		stock.get().setInventory(inventory);
 	}
-
+	
 	public void setPag(int pag) {
 		this.pag = pag;
+	}
+	public void setMaxPages(int maxPages) {
+		this.stockPages = maxPages;
 	}
 }

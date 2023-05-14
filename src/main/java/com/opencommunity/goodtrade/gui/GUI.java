@@ -1,8 +1,10 @@
-package com.minedhype.ishop.gui;
+package com.opencommunity.goodtrade.gui;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import com.opencommunity.goodtrade.inventories.InvStock;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,7 +16,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import net.md_5.bungee.api.ChatColor;
-import static com.minedhype.ishop.inventories.InvStock.inShopInv;
 
 public abstract class GUI {
 	public static final Map<String, GUI> inventoriesOpen = new HashMap<>();
@@ -67,9 +68,9 @@ public abstract class GUI {
 		player.openInventory(inventory);
 		inventoriesOpen.put(player.getName(), this);
 		if(uuid != null)
-			inShopInv.putIfAbsent(player, uuid);
+			InvStock.inShopInv.putIfAbsent(player, uuid);
 		else
-			inShopInv.putIfAbsent(player, player.getUniqueId());
+			InvStock.inShopInv.putIfAbsent(player, player.getUniqueId());
 	}
 
 	public void open(Player player) { open(player, null); }

@@ -1,4 +1,4 @@
-package com.minedhype.ishop;
+package com.opencommunity.goodtrade;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class StockShop {
 			return;
 		PreparedStatement stmt = null;
 		try {
-			stmt = iShop.getConnection().prepareStatement("DELETE FROM zooMercaStocks;");
+			stmt = GoodTrade.getConnection().prepareStatement("DELETE FROM zooMercaStocks;");
 			stmt.execute();
 		} catch (Exception e) { e.printStackTrace(); }
 			finally {
@@ -54,7 +54,7 @@ public class StockShop {
 	private void saveStockData() {
 		PreparedStatement stmt = null;
 		try {
-			stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaStocks (owner, items, pag) VALUES (?,?,?);");
+			stmt = GoodTrade.getConnection().prepareStatement("INSERT INTO zooMercaStocks (owner, items, pag) VALUES (?,?,?);");
 			JsonArray items = new JsonArray();
 			for(ItemStack item : inventory.getContents()) {
 				if(item == null)

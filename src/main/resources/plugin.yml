@@ -1,10 +1,10 @@
 name: GoodTrade
-main: com.minedhype.ishop.iShop
-description: Item trading shops
-author: Beez0r, Envel
-version: "${project.version}"
-api-version: "1.18"
-softdepend: [Vault, WorldGuard]
+main: com.minedhype.goodtrade.GoodTrade
+description: Item trading shops with unique GUI!
+authors: [Beez0r, Envel]
+version: "2.3"
+api-version: "1.19"
+softdepend: [Vault]
 commands:
   goodtrade:
     description: "/shop"

@@ -1,4 +1,4 @@
-package com.minedhype.ishop.gui;
+package com.opencommunity.goodtrade.gui;
 
 import org.bukkit.entity.Player;
 
