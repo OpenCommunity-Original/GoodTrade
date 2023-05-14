@@ -13,6 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.opencommunity.goodtrade.inventories.InvAdminShop;
+import com.opencommunity.goodtrade.utils.FormatUtil;
+import com.opencommunity.goodtrade.utils.LocaleAPI;
+import com.opencommunity.goodtrade.utils.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -242,11 +245,11 @@ public class Shop {
 					if(!out0Changed2)
 						row0out2 = row0.get().getItemOut2().getType().toString();
 					if(row0.get().getItemOut2() == null || row0.get().getItemOut2().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0out + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0out + ")");
 					else if(row0.get().getItemOut() == null || row0.get().getItemOut().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0out2 + ")");
 					else
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0out + " & " + row0out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0out + " & " + row0out2 + ")");
 					outCount.getAndIncrement();
 				}
 			Optional<RowStore> row1 = s.getRow(1);
@@ -285,11 +288,11 @@ public class Shop {
 					if(!out1Changed2)
 						row1out2 = row1.get().getItemOut2().getType().toString();
 					if(row1.get().getItemOut2() == null || row1.get().getItemOut2().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1out + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1out + ")");
 					else if(row1.get().getItemOut() == null || row1.get().getItemOut().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1out2 + ")");
 					else
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1out + " & " + row1out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1out + " & " + row1out2 + ")");
 					outCount.getAndIncrement();
 				}
 			Optional<RowStore> row2 = s.getRow(2);
@@ -328,11 +331,11 @@ public class Shop {
 					if(!out2Changed2)
 						row2out2 = row2.get().getItemOut2().getType().toString();
 					if(row2.get().getItemOut2() == null || row2.get().getItemOut2().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2out + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2out + ")");
 					else if(row2.get().getItemOut() == null || row2.get().getItemOut().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2out2 + ")");
 					else
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2out + " & " + row2out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2out + " & " + row2out2 + ")");
 					outCount.getAndIncrement();
 				}
 			Optional<RowStore> row3 = s.getRow(3);
@@ -371,11 +374,11 @@ public class Shop {
 					if(!out3Changed2)
 						row3out2 = row3.get().getItemOut2().getType().toString();
 					if(row3.get().getItemOut2() == null || row3.get().getItemOut2().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3out + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3out + ")");
 					else if(row3.get().getItemOut() == null || row3.get().getItemOut().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3out2 + ")");
 					else
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3out + " & " + row3out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3out + " & " + row3out2 + ")");
 					outCount.getAndIncrement();
 				}
 			Optional<RowStore> row4 = s.getRow(4);
@@ -414,11 +417,11 @@ public class Shop {
 					if(!out4Changed2)
 						row4out2 = row4.get().getItemOut2().getType().toString();
 					if(row4.get().getItemOut2() == null || row4.get().getItemOut2().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4out + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4out + ")");
 					else if(row4.get().getItemOut() == null || row4.get().getItemOut().getType().equals(Material.AIR))
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4out2 + ")");
 					else
-						player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4out + " & " + row4out2 + ")");
+						player.sendMessage(LocaleAPI.getMessage(player, "out_of_stock").replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4out + " & " + row4out2 + ")");
 					outCount.getAndIncrement();
 				}
 		});
@@ -1104,45 +1107,47 @@ public class Shop {
 					}
 				}
 			}
-		} else if(rowBroadcast) {
-			if(inA1 == 0 && outA1 == 0)
-				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
-			else if(inA1 == 0 && outA2 == 0)
-				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i2).replaceAll("%p", player.getName()));
-			else if(inA2 == 0 && outA1 == 0)
-				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
-			else if(inA2 == 0 && outA2 == 0)
-				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i1).replaceAll("%p", player.getName()));
-			else if(inA1 == 0)
-				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
-			else if(inA2 == 0)
-				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
-			else if(outA1 == 0)
-				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
-			else if(outA2 == 0)
-				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
-			else
-				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+		} else if (rowBroadcast) {
+			if (inA1 == 0 && outA1 == 0) {
+				Bukkit.broadcastMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "sell")).replaceAll("%in", o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
+			} else if (inA1 == 0 && outA2 == 0) {
+				Bukkit.broadcastMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "sell")).replaceAll("%in", o1).replaceAll("%out", i2).replaceAll("%p", player.getName()));
+			} else if (inA2 == 0 && outA1 == 0) {
+				Bukkit.broadcastMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "sell")).replaceAll("%in", o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
+			} else if (inA2 == 0 && outA2 == 0) {
+				Bukkit.broadcastMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "sell")).replaceAll("%in", o1).replaceAll("%out", i1).replaceAll("%p", player.getName()));
+			} else if (inA1 == 0) {
+				Bukkit.broadcastMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "sell")).replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
+			} else if (inA2 == 0) {
+				Bukkit.broadcastMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "sell")).replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
+			} else if (outA1 == 0) {
+				Bukkit.broadcastMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "sell")).replaceAll("%in", o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+			} else if (outA2 == 0) {
+				Bukkit.broadcastMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "sell")).replaceAll("%in", o1).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+			} else {
+				Bukkit.broadcastMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "sell")).replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+			}
 		}
-		if(!rowBroadcast && shopNotifications) {
-			if(inA1 == 0 && outA1 == 0)
-				player.sendMessage(Messages.SHOP_PURCHASE.toString().replaceAll("%in", o2).replaceAll("%out", i2));
-			else if(inA1 == 0 && outA2 == 0)
-				player.sendMessage(Messages.SHOP_PURCHASE.toString().replaceAll("%in", o1).replaceAll("%out", i2));
-			else if(inA2 == 0 && outA1 == 0)
-				player.sendMessage(Messages.SHOP_PURCHASE.toString().replaceAll("%in",o2).replaceAll("%out", i1));
-			else if(inA2 == 0 && outA2 == 0)
-				player.sendMessage(Messages.SHOP_PURCHASE.toString().replaceAll("%in", o1).replaceAll("%out", i1));
-			else if(inA1 == 0)
-				player.sendMessage(Messages.SHOP_PURCHASE.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i2));
-			else if(inA2 == 0)
-				player.sendMessage(Messages.SHOP_PURCHASE.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1));
-			else if(outA1 == 0)
-				player.sendMessage(Messages.SHOP_PURCHASE.toString().replaceAll("%in", o2).replaceAll("%out", i1 + " & " + i2));
-			else if(outA2 == 0)
-				player.sendMessage(Messages.SHOP_PURCHASE.toString().replaceAll("%in", o1).replaceAll("%out", i1 + " & " + i2));
-			else
-				player.sendMessage(Messages.SHOP_PURCHASE.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1 + " & " + i2));
+		if (!rowBroadcast && shopNotifications) {
+			if (inA1 == 0 && outA1 == 0) {
+				player.sendMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "buy")).replaceAll("%in", o2).replaceAll("%out", i2));
+			} else if (inA1 == 0 && outA2 == 0) {
+				player.sendMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "buy")).replaceAll("%in", o1).replaceAll("%out", i2));
+			} else if (inA2 == 0 && outA1 == 0) {
+				player.sendMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "buy")).replaceAll("%in", o2).replaceAll("%out", i1));
+			} else if (inA2 == 0 && outA2 == 0) {
+				player.sendMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "buy")).replaceAll("%in", o1).replaceAll("%out", i1));
+			} else if (inA1 == 0) {
+				player.sendMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "buy")).replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i2));
+			} else if (inA2 == 0) {
+				player.sendMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "buy")).replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1));
+			} else if (outA1 == 0) {
+				player.sendMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "buy")).replaceAll("%in", o2).replaceAll("%out", i1 + " & " + i2));
+			} else if (outA2 == 0) {
+				player.sendMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "buy")).replaceAll("%in", o1).replaceAll("%out", i1 + " & " + i2));
+			} else {
+				player.sendMessage(FormatUtil.replaceFormat(LocaleAPI.getMessage(player, "buy")).replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1 + " & " + i2));
+			}
 		}
 	}
 
