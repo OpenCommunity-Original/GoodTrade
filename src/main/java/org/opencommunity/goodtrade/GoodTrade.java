@@ -1,4 +1,4 @@
-package com.opencommunity.goodtrade;
+package org.opencommunity.goodtrade;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,8 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
-import com.opencommunity.goodtrade.gui.GUIEvent;
-import com.opencommunity.goodtrade.utils.LocaleAPI;
+import org.opencommunity.goodtrade.gui.GUIEvent;
+import org.opencommunity.goodtrade.utils.LocaleAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;

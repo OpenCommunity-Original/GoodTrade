@@ -1,4 +1,4 @@
-package com.opencommunity.goodtrade.utils;
+package org.opencommunity.goodtrade.utils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;

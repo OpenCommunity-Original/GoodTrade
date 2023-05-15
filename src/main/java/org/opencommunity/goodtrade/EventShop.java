@@ -1,9 +1,9 @@
-package com.opencommunity.goodtrade;
+package org.opencommunity.goodtrade;
 
-import com.opencommunity.goodtrade.inventories.InvAdminShop;
-import com.opencommunity.goodtrade.inventories.InvShop;
-import com.opencommunity.goodtrade.inventories.InvStock;
-import com.opencommunity.goodtrade.utils.Util;
+import org.opencommunity.goodtrade.inventories.InvAdminShop;
+import org.opencommunity.goodtrade.inventories.InvShop;
+import org.opencommunity.goodtrade.inventories.InvStock;
+import org.opencommunity.goodtrade.utils.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

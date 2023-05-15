@@ -1,4 +1,4 @@
-package com.opencommunity.goodtrade;
+package org.opencommunity.goodtrade;
 
 import java.sql.PreparedStatement;
 import org.bukkit.Material;

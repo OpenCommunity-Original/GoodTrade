@@ -1,19 +1,19 @@
-package com.opencommunity.goodtrade.inventories;
+package org.opencommunity.goodtrade.inventories;
 
 import java.util.Optional;
-import com.opencommunity.goodtrade.GoodTrade;
-import com.opencommunity.goodtrade.Permission;
-import com.opencommunity.goodtrade.RowStore;
-import com.opencommunity.goodtrade.Shop;
-import com.opencommunity.goodtrade.Utils;
-import com.opencommunity.goodtrade.utils.FormatUtil;
-import com.opencommunity.goodtrade.utils.LocaleAPI;
+import org.opencommunity.goodtrade.GoodTrade;
+import org.opencommunity.goodtrade.Permission;
+import org.opencommunity.goodtrade.RowStore;
+import org.opencommunity.goodtrade.Shop;
+import org.opencommunity.goodtrade.Utils;
+import org.opencommunity.goodtrade.utils.FormatUtil;
+import org.opencommunity.goodtrade.utils.LocaleAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import com.opencommunity.goodtrade.gui.GUI;
+import org.opencommunity.goodtrade.gui.GUI;
 
 public class InvAdminShop extends GUI {
 	public static boolean remoteManage = GoodTrade.config.getBoolean("remoteManage");

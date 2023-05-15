@@ -1,15 +1,14 @@
-package com.opencommunity.goodtrade.inventories;
+package org.opencommunity.goodtrade.inventories;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.HashMap;
-import com.opencommunity.goodtrade.Permission;
-import com.opencommunity.goodtrade.Shop;
-import com.opencommunity.goodtrade.StockShop;
-import com.opencommunity.goodtrade.gui.GUI;
-import com.opencommunity.goodtrade.utils.LocaleAPI;
+import org.opencommunity.goodtrade.Permission;
+import org.opencommunity.goodtrade.StockShop;
+import org.opencommunity.goodtrade.gui.GUI;
+import org.opencommunity.goodtrade.utils.LocaleAPI;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;

@@ -1,4 +1,4 @@
-package com.opencommunity.goodtrade.gui;
+package org.opencommunity.goodtrade.gui;
 
 import org.bukkit.entity.Player;
 

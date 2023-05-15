@@ -1,10 +1,10 @@
-package com.opencommunity.goodtrade;
+package org.opencommunity.goodtrade;
 
 import java.util.Optional;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import com.opencommunity.goodtrade.inventories.InvAdminShop;
+import org.opencommunity.goodtrade.inventories.InvAdminShop;
 
 public class Utils {
 	public static boolean hasStock(Player player, ItemStack item) {

@@ -1,10 +1,10 @@
-package com.opencommunity.goodtrade.gui;
+package org.opencommunity.goodtrade.gui;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.opencommunity.goodtrade.inventories.InvStock;
+import org.opencommunity.goodtrade.inventories.InvStock;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

@@ -1,4 +1,4 @@
-package com.opencommunity.goodtrade;
+package org.opencommunity.goodtrade;
 
 public enum Permission {
 	SHOP_ADMIN("goodtrade.admin"),

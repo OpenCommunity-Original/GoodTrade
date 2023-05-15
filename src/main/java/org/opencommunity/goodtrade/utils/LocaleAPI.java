@@ -1,4 +1,4 @@
-package com.opencommunity.goodtrade.utils;
+package org.opencommunity.goodtrade.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

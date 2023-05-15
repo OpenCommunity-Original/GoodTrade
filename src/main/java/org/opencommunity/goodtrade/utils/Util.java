@@ -1,6 +1,5 @@
-package com.opencommunity.goodtrade.utils;
+package org.opencommunity.goodtrade.utils;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.bukkit.Bukkit;

@@ -3,8 +3,8 @@ plugins {
     id 'java'
 }
 
-group 'com.minedhype'
-version '1.0'
+group 'org.opencommunity'
+version '2.3'
 jar.enabled = false;
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17

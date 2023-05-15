@@ -1,9 +1,9 @@
-package com.opencommunity.goodtrade;
+package org.opencommunity.goodtrade;
 
-import com.opencommunity.goodtrade.inventories.*;
-import com.opencommunity.goodtrade.utils.FormatUtil;
-import com.opencommunity.goodtrade.utils.LocaleAPI;
-import com.opencommunity.goodtrade.utils.Util;
+import org.opencommunity.goodtrade.inventories.*;
+import org.opencommunity.goodtrade.utils.FormatUtil;
+import org.opencommunity.goodtrade.utils.LocaleAPI;
+import org.opencommunity.goodtrade.utils.Util;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.Economy;

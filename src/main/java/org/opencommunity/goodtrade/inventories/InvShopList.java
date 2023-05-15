@@ -1,8 +1,8 @@
-package com.opencommunity.goodtrade.inventories;
+package org.opencommunity.goodtrade.inventories;
 
-import com.opencommunity.goodtrade.Shop;
-import com.opencommunity.goodtrade.GoodTrade;
-import com.opencommunity.goodtrade.utils.LocaleAPI;
+import org.opencommunity.goodtrade.Shop;
+import org.opencommunity.goodtrade.GoodTrade;
+import org.opencommunity.goodtrade.utils.LocaleAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -12,7 +12,8 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import com.opencommunity.goodtrade.gui.GUI;
+import org.opencommunity.goodtrade.gui.GUI;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

@@ -1,7 +1,7 @@
-package com.opencommunity.goodtrade.gui;
+package org.opencommunity.goodtrade.gui;
 
-import com.opencommunity.goodtrade.GoodTrade;
-import com.opencommunity.goodtrade.inventories.InvStock;
+import org.opencommunity.goodtrade.GoodTrade;
+import org.opencommunity.goodtrade.inventories.InvStock;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
