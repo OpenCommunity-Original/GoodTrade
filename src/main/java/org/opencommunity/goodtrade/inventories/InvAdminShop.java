@@ -17,7 +17,7 @@ import org.opencommunity.goodtrade.gui.GUI;
 
 public class InvAdminShop extends GUI {
 	public static boolean remoteManage = GoodTrade.config.getBoolean("remoteManage");
-	public static boolean stockGUIShop = GoodTrade.config.getBoolean("enableStockAccessFromShopGUI");
+	public static boolean stockGUGoodTrade = GoodTrade.config.getBoolean("enableStockAccessFromShopGUI");
 	public static boolean stockCommandEnabled = GoodTrade.config.getBoolean("enableStockCommand");
 	public static boolean usePerms = GoodTrade.config.getBoolean("usePermissions");
 	public static int maxPages = GoodTrade.config.getInt("stockPages");
@@ -92,7 +92,7 @@ public class InvAdminShop extends GUI {
 						});
 					}
 				} else if(x == 7 && y == 0) {
-					if(stockGUIShop && !shop.isAdmin() && shop.getOwner().equals(player.getUniqueId())) {
+					if(stockGUGoodTrade && !shop.isAdmin() && shop.getOwner().equals(player.getUniqueId())) {
 						placeItem(y * 9 + x, GUI.createItem(Material.CHEST, LocaleAPI.getMessage(player, "stock_title")), p -> {
 							p.closeInventory();
 							InvStock inv = InvStock.getInvStock(player.getUniqueId(), player);

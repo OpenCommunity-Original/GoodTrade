@@ -906,7 +906,7 @@ public class CommandShop implements CommandExecutor {
 			InvAdminShop.maxPages = GoodTrade.config.getInt("stockPages");
 			InvAdminShop.permissionMax = GoodTrade.config.getInt("maxStockPages");
 			InvAdminShop.stockCommandEnabled = GoodTrade.config.getBoolean("enableStockCommand");
-			InvAdminShop.stockGUIShop = GoodTrade.config.getBoolean("enableStockAccessFromShopGUI");
+			InvAdminShop.stockGUGoodTrade = GoodTrade.config.getBoolean("enableStockAccessFromShopGUI");
 			InvAdminShop.usePerms = GoodTrade.config.getBoolean("usePermissions");
 			InvCreateRow.disabledItemList = GoodTrade.config.getStringList("disabledItemsList");
 			InvCreateRow.itemsDisabled = GoodTrade.config.getBoolean("disabledItems");
