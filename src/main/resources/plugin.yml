@@ -2,8 +2,8 @@ name: GoodTrade
 main: org.opencommunity.goodtrade.GoodTrade
 description: Item trading shops with unique GUI!
 authors: [Beez0r, Envel]
-version: "2.3"
-api-version: "1.19"
+version: 2.3
+api-version: 1.20
 softdepend: [Vault]
 commands:
   goodtrade:
